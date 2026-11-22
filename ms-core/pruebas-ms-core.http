@@ -1,0 +1,78 @@
+### Pruebas de MS-Core (extensión "REST Client" de VS Code: clic en "Send Request")
+
+### 1. Listar todos los lotes
+GET http://localhost:8080/api/lotes
+
+### 2. Listar lotes del proveedor 1
+GET http://localhost:8080/api/lotes?idProveedor=1
+
+### 3. Ver el cálculo de comisión (RF-06): 5000 -> 500 -> 5500
+GET http://localhost:8080/api/lotes/simular-precio?montoLiquido=5000
+
+### 4. Crear un lote válido (RF-04 + RF-06) -> 201 Created
+POST http://localhost:8080/api/lotes
+Content-Type: application/json
+
+{
+  "idProveedor": 1,
+  "nombreComercio": "Minimarket Demo",
+  "nombreProducto": "Galletas integrales pack x6",
+  "descripcion": "Caja sellada",
+  "categoria": "ABARROTES_ENVASADOS",
+  "stock": 10,
+  "montoLiquido": 2000,
+  "precioNormal": 4500,
+  "fechaCaducidad": "2027-03-31",
+  "vigenciaHoras": 6,
+  "latitud": -33.0458,
+  "longitud": -71.6197
+}
+
+### 5. Intentar publicar un alimento fresco (RF-04) -> 400 Bad Request
+POST http://localhost:8080/api/lotes
+Content-Type: application/json
+
+{
+  "idProveedor": 1,
+  "nombreComercio": "Minimarket Demo",
+  "nombreProducto": "Carne molida 1 kg",
+  "descripcion": "Bandeja",
+  "categoria": "CONGELADOS",
+  "stock": 5,
+  "montoLiquido": 3000,
+  "precioNormal": 6000,
+  "fechaCaducidad": "2027-01-10",
+  "vigenciaHoras": 4
+}
+
+### 6. Obtener un lote por id
+GET http://localhost:8080/api/lotes/1
+
+### 7. Editar un lote
+PUT http://localhost:8080/api/lotes/1
+Content-Type: application/json
+
+{
+  "idProveedor": 1,
+  "nombreComercio": "Minimarket Demo",
+  "nombreProducto": "Arroz 1 kg (pack x6)",
+  "descripcion": "Pack sellado - precio rebajado",
+  "categoria": "ABARROTES_ENVASADOS",
+  "stock": 8,
+  "montoLiquido": 2800,
+  "precioNormal": 5200,
+  "fechaCaducidad": "2027-02-28",
+  "vigenciaHoras": 8
+}
+
+### 8. Registrar una venta de 2 unidades
+PATCH http://localhost:8080/api/lotes/1/ventas
+Content-Type: application/json
+
+{ "cantidad": 2 }
+
+### 9. Métricas de ventas del vendedor (RF-07)
+GET http://localhost:8080/api/proveedores/1/metricas
+
+### 10. Eliminar un lote -> 204 No Content
+DELETE http://localhost:8080/api/lotes/3
