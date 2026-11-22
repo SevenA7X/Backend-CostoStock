@@ -1,0 +1,66 @@
+### Pruebas de ms-proveedor (issue #41) con la extensión "REST Client" de VS Code
+### Requiere ms-core corriendo en el puerto 8080.
+
+### 1. RF-05: publicar un lote con foto nativa (JPEG en Base64) -> 201 Created
+POST http://localhost:8082/api/proveedor/lotes
+Content-Type: application/json
+
+{
+  "idProveedor": 1,
+  "nombreComercio": "Minimarket Demo",
+  "nombreProducto": "Galletas integrales pack x6",
+  "descripcion": "Caja sellada",
+  "categoria": "ABARROTES_ENVASADOS",
+  "stock": 10,
+  "montoLiquido": 2000,
+  "precioNormal": 4500,
+  "fechaCaducidad": "2027-03-31",
+  "vigenciaHoras": 6,
+  "fotoBase64": "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAQABADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwB/h7Qv7b+0f6T5Hk7f+We7Oc+49KPEOhf2J9n/ANJ8/wA7d/yz24xj3PrR4e13+xPtH+jef523/lptxjPsfWjxDrv9t/Z/9G8jyd3/AC03Zzj2HpXL7vL5nD7nJ5n/2Q==",
+  "latitud": -33.0458,
+  "longitud": -71.6197
+}
+
+### 2. Ver la foto guardada (se muestra como imagen)
+GET http://localhost:8082/api/proveedor/fotos/1
+
+### 3. Sin foto -> 400 (RF-05 exige la foto)
+POST http://localhost:8082/api/proveedor/lotes
+Content-Type: application/json
+
+{
+  "idProveedor": 1,
+  "nombreComercio": "Minimarket Demo",
+  "nombreProducto": "Arroz 1 kg",
+  "descripcion": "Bolsa sellada",
+  "categoria": "ABARROTES_ENVASADOS",
+  "stock": 5,
+  "montoLiquido": 1000,
+  "precioNormal": 2500,
+  "fechaCaducidad": "2027-03-31",
+  "vigenciaHoras": 6
+}
+
+### 4. Alimento fresco -> 400 (lo rechaza MS-Core por RF-04 y se reenvía el mensaje)
+POST http://localhost:8082/api/proveedor/lotes
+Content-Type: application/json
+
+{
+  "idProveedor": 1,
+  "nombreComercio": "Minimarket Demo",
+  "nombreProducto": "Carne molida 1 kg",
+  "descripcion": "Bandeja",
+  "categoria": "CONGELADOS",
+  "stock": 5,
+  "montoLiquido": 3000,
+  "precioNormal": 6000,
+  "fechaCaducidad": "2027-01-10",
+  "vigenciaHoras": 4,
+  "fotoBase64": "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAQABADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwB/h7Qv7b+0f6T5Hk7f+We7Oc+49KPEOhf2J9n/ANJ8/wA7d/yz24xj3PrR4e13+xPtH+jef523/lptxjPsfWjxDrv9t/Z/9G8jyd3/AC03Zzj2HpXL7vL5nD7nJ5n/2Q=="
+}
+
+### 5. Historial de publicaciones del proveedor 1
+GET http://localhost:8082/api/proveedor/1/publicaciones
+
+### 6. RF-07: métricas de ventas del vendedor (ventas de MS-Core + publicaciones con foto)
+GET http://localhost:8082/api/proveedor/1/metricas
