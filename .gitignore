@@ -1,2 +1,16 @@
+# IDEs
 .idea/
+.vscode/
+*.iml
+
+# Maven (microservicios Spring Boot)
 target/
+
+# Gradle / Android (app-costostock)
+.gradle/
+build/
+local.properties
+captures/
+.externalNativeBuild
+.cxx
+.DS_Store
