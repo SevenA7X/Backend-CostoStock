@@ -1,0 +1,23 @@
+### Pruebas de ms-clima (issue #42) con la extensión "REST Client" de VS Code
+### Necesita internet: consume la API pública Open-Meteo.
+
+### 1. Ciudades disponibles
+GET http://localhost:8083/api/clima/ciudades
+
+### 2. Clima actual de Valparaíso (primera vez: consulta a Open-Meteo)
+GET http://localhost:8083/api/clima?ciudad=VALPARAISO
+
+### 3. Repetir antes de 10 minutos -> "desdeCache": true (no vuelve a llamar a Open-Meteo)
+GET http://localhost:8083/api/clima?ciudad=VALPARAISO
+
+### 4. Clima de Santiago
+GET http://localhost:8083/api/clima?ciudad=SANTIAGO
+
+### 5. Clima por coordenadas (ej. ubicación de una tienda)
+GET http://localhost:8083/api/clima/coordenadas?lat=-33.0245&lon=-71.5518
+
+### 6. Ciudad no válida -> 400
+GET http://localhost:8083/api/clima?ciudad=LIMA
+
+### 7. Historial de consultas guardadas
+GET http://localhost:8083/api/clima/historial?ciudad=VALPARAISO
