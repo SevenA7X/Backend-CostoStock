@@ -7,7 +7,7 @@ Aplicación móvil y arquitectura de microservicios para la publicación y resca
 ## 1. Nombre del proyecto
 
 **CostoStock**  
-Asignatura: Desarrollo de Aplicaciones Móviles (DSY1105) · Evaluación Parcial 3 / 4
+Asignatura: Desarrollo de Aplicaciones Móviles (DSY1105) · Evaluación Parcial 3
 
 ---
 
