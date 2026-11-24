@@ -1,6 +1,6 @@
 # CostoStock
 
-Aplicación móvil y arquitectura de microservicios para la publicación y rescate de lotes de productos en sobrestock o próximos a vencer, con precio rebajado y cálculo del CO₂ evitado.
+Backend basado en microservicios desarrollados con Spring Boot (ms-core y ms-transacciones) para la aplicación CostoStock, un marketplace de excedentes destinado a la publicación y rescate de lotes de productos en sobrestock o próximos a vencer a precio rebajado, integrando gestión de compradores y proveedores, cálculo de comisiones, reservas temporales, emisión de vouchers QR y medición de CO₂ evitado.
 
 ---
 
@@ -20,22 +20,28 @@ Asignatura: Desarrollo de Aplicaciones Móviles (DSY1105) · Evaluación Parcial
 
 ---
 
+
 ## 3. Funcionalidades
 
-- **Catálogo de ofertas con filtro GPS (RF-08):** visualización de lotes activos con stock disponible y fecha vigente, filtrado por proximidad geográfica (radios de 5, 15 y 30 km mediante fórmula de Haversine).
-- **Registro de compradores y acceso de proveedores (RF-02 / RF-03):** registro ligero de compradores y autenticación de proveedores con contraseña cifrada en SHA-256 y sesión mediante token Bearer.
-- **Publicación de lotes y cálculo de comisión (RF-05 / RF-06):** creación de ofertas con fotografía, stock, vigencia y cálculo automático de comisión del 10 % (`precio final = monto líquido + 10 %`).
-- **Reserva temporal con liberación automática (RF-12):** bloqueo de stock por 10 minutos con tarea programada que libera unidades al expirar el tiempo.
-- **Pago simulado y emisión de voucher QR (RF-13 / RF-14):** confirmación de compra, generación de código QR de retiro y validación de entrega.
-- **Métricas de impacto ambiental (RF-07):** cálculo de kg de CO₂ evitados y su equivalencia en árboles plantados.
+### `ms-core` (puerto `8080`)
+- **Registro ligero de compradores (RF-02):** recibe nombre, correo y teléfono, valida el formato del correo y que el teléfono contenga solo dígitos (mínimo 8), y actualiza el registro conservando el mismo ID si el correo ya existe.
+- **Acceso de proveedores (RF-03):** autentica mediante correo y contraseña almacenada como *hash* SHA-256, emitiendo un *token* de sesión válido por 8 horas para uso en `Authorization: Bearer <token>`.
+- **Publicación de lotes (RF-05 / RF-06):** registra el lote con su imagen en Base64 y calcula automáticamente la comisión del 10 % sobre el monto líquido (`precio final = monto líquido + 10 %`).
+- **Métricas del vendedor (RF-07):** consolida lotes publicados y activos, unidades, ventas brutas, monto líquido acumulado, comisión generada, kilogramos de CO₂ evitados y equivalencia anual en árboles (`21 kg CO₂ = 1 árbol/año`).
+- **Verificación de estado (*health check*):** expone el estado operativo del microservicio.
 
----
+### `ms-transacciones` (puerto `8081`)
+- **Catálogo con filtro GPS (RF-08):** expone lotes activos, con stock disponible y vigentes, aplicando filtrado geográfico por radio (`5`, `15` o `30 km`; `30 km` por defecto) mediante la fórmula de **Haversine** cuando se envían `lat` y `lon`.
+- **Reserva temporal (RF-12):** descuenta stock al crear una reserva por 10 minutos (hasta 10 unidades) y calcula subtotal, comisión de servicio del 5 %, total y CO₂ evitado.
+- **Liberación automática de reservas vencidas:** ejecuta una tarea programada cada 15 segundos para devolver al stock las unidades de reservas expiradas.
+- **Cancelación de reservas:** restituye el stock de reservas no pagadas al cancelarse.
+- **Pago simulado y emisión de *voucher* (RF-13):** confirma la reserva, permite simular pagos rechazados y genera el código del *voucher* QR junto con los datos de retiro.
+- **Estandarización de respuestas de error:** devuelve errores estructurados como `{"error": "...", "codigo": "..."}` asociados a sus respectivos códigos HTTP (`400`, `401`, `402`, `404`, `409`, `410`).
 
 ## 4. Endpoints utilizados
 
 ### API Externa
-- **Servicio:** *[Completar con la URL base y endpoint de la API externa consumida vía Retrofit en la app Android, por ejemplo Open-Meteo / Nominatim / API pública utilizada]*
-  - `GET <URL_ENDPOINT_EXTERNO>` — *[Descripción breve de qué dato obtiene y dónde se muestra en la app]*
+soon...
 
 ### Microservicio `ms-core` (`http://localhost:8080`)
 
@@ -70,10 +76,11 @@ Asignatura: Desarrollo de Aplicaciones Móviles (DSY1105) · Evaluación Parcial
 ## 5. Pasos para ejecutar
 
 ### Requisitos previos
-- JDK 21 (o JDK 17+)
-- Android Studio con SDK de Android y emulador o dispositivo físico configurado
 
-### 1. Levantar los microservicios (Backend)
+- JDK 17 o superior y Maven Wrapper (`mvnw` / `mvnw.cmd`)
+- Android Studio con SDK de Android (API 26+ / Android 13+ API 33 para notificaciones) y emulador o dispositivo físico con depuración USB activa
+
+### 1. Levantar los microservicios (*backend*)
 
 ```powershell
 # Terminal 1 - ms-core (puerto 8080)
@@ -83,3 +90,31 @@ cd ms-core
 # Terminal 2 - ms-transacciones (puerto 8081)
 cd ms-transacciones
 .\mvnw.cmd spring-boot:run
+```
+
+En macOS / Linux, utilice `./mvnw` en lugar de `.\mvnw.cmd`.  
+Verificación: `http://localhost:8080/api/health`, `http://localhost:8081/api/health` y consola H2 de `ms-core` en `http://localhost:8080/h2-console` (`jdbc:h2:file:./data/coredb`, usuario `sa`, sin contraseña).
+
+### 2. Redirigir puertos hacia el emulador Android
+
+```powershell
+adb reverse tcp:8080 tcp:8080
+adb reverse tcp:8081 tcp:8081
+```
+
+### 3. Clonar y ejecutar la aplicación móvil (*frontend*)
+
+```bash
+git clone [https://github.com/tu-usuario/costostock.git](https://github.com/tu-usuario/costostock.git)
+```
+
+1. Abra la carpeta del proyecto en **Android Studio** y espere la sincronización con Gradle.
+2. Seleccione un emulador (API 26+) o dispositivo físico con depuración USB activa.
+3. Ejecute la aplicación presionando `Shift + F10` o el botón **Run**.
+
+> **Nota de permisos:** en Android 13 (API 33) o superior, el sistema solicitará permiso para **enviar notificaciones** durante la primera compra; debe aceptarse para completar el flujo.
+
+---
+
+## 6. Captura del APK firmado y .jks
+
