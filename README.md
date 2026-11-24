@@ -13,12 +13,10 @@ Asignatura: Desarrollo de Aplicaciones Móviles (DSY1105) · Evaluación Parcial
 
 ## 2. Integrantes
 
-| Integrante | Correo | Rol / Aporte |
-|---|---|---|
-| Mario Antonio Quintero Almendras | ma.quinteroa@duocuc.cl | Arquitectura del proyecto, aplicación móvil Android (Kotlin / Jetpack Compose) y microservicios |
-| Romina Paz Carrasco Ruiz | ro.carrascor@duocuc.cl | Desarrollo frontend/backend, reservas temporales, pagos simulados y registro de compradores |
-| Nicolás Fernando Jaramillo Zamora | ni.jaramilloz@duocuc.cl | Gestión de vouchers QR e historial |
-| Nicol Andreina Valero López | nic.valero@duocuc.cl | Publicación de lotes, cálculo de comisión (10 %) y métricas |
+- Mario Antonio Quintero Almendras
+- Romina Paz Carrasco Ruiz
+- Nicolás Fernando Jaramillo Zamora
+- Nicol Andreina Valero López
 
 ---
 
