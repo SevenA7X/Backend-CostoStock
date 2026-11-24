@@ -118,3 +118,6 @@ git clone [https://github.com/tu-usuario/costostock.git](https://github.com/tu-u
 
 ## 6. Captura del APK firmado y .jks
 
+<img width="720" height="680" alt="image" src="https://github.com/user-attachments/assets/98564ca3-c997-4ec0-bf01-7959e5dd703e" />
+
+
